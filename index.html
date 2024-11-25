@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+
+    <!-- General -->
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="Rotacione entre tabs do navegador de maneira simples automatizada.">
+    <meta name="author" content="Eduardo Mior">
+    <meta name="robots" content="index">
+    <title>Tab Rotate</title>
+
+    <!-- Icons -->
+    <link rel="icon" type="image/svg+xml" href="icon.svg" sizes="192x192">
+
+    <!-- Android -->
+    <meta name="theme-color" content="#FFFFFF">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Tab Rotate">
+
+    <!-- iOS -->
+    <meta name="apple-mobile-web-app-title" content="Tab Rotate">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+
+    <!-- PWA -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- OG -->
+    <meta property="og:locale" content="pt_BR">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Tab Rotate">
+    <meta property="og:site_name" content="Tab Rotate">
+    <meta property="og:description" content="Rotacione entre tabs do navegador de maneira simples automatizada.">
+    <meta property="og:url" content="https://tab-rotate.vercel.app/">
+    <meta property="og:image" content="og-icon.png">
+    <meta property="og:image:type" content="image/png">
+    <meta property="og:image:alt" content="Tab Rotate">
+
+    <!-- CSS -->
+    <style>
+        * {
+            font-family: system-ui !important;
+            box-sizing: border-box !important;
+            color: #222222;
+        }
+
+        body {
+            margin: 0px !important;
+        }
+
+        .titulo {
+            gap: 4px;
+        }
+
+        .status-atual {
+            gap: 12px;
+        }
+
+        .titulo img {
+            width: 52px;
+        }
+
+        .container {
+            margin-top: 40px;
+            max-width: unset !important;
+        }
+
+        .footer {
+            gap: 16px;
+        }
+
+        .status-switch {
+            position: absolute;
+            margin-top: 6px;
+            margin-left: -8px;
+        }
+
+        .form-check-input {
+            height: 30px !important;
+            width: 120px !important;
+            margin-left: 4px;
+        }
+
+        .form-switch,
+        .form-check-input,
+        .status-switch {
+            cursor: pointer;
+        }
+
+        .status-switch.on {
+            color: white !important;
+            animation: blink 1s linear infinite;
+        }
+
+        .btn-outline-danger,
+        .btn-outline-primary {
+            padding: 2px 6px !important;
+            width: 100px;
+        }
+
+        table,
+        .container {
+            width: 1100px !important;
+        }
+
+        td {
+            vertical-align: middle;
+        }
+
+        td:nth-child(1) {
+            font-weight: bold;
+            width: 50px;
+        }
+
+        td:nth-child(2) {
+            width: 300px;
+            padding-right: 10px !important;
+        }
+
+        td:nth-child(3) {
+            width: 500px;
+            padding-right: 10px !important;
+        }
+
+        td:nth-child(3)>input {
+            width: 480px;
+            margin-left: -4px;
+            padding-left: 8px !important;
+        }
+
+        td:nth-child(4) {
+            width: 150px;
+            padding-right: 10px !important;
+        }
+
+        td:nth-child(4)>input {
+            width: 135px;
+            margin-left: -4px;
+            padding-left: 8px !important;
+        }
+
+        td:nth-child(5) {
+            width: 80px;
+            padding-right: 10px !important;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.2;
+            }
+        }
+    </style>
+
+    <!-- Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Utils -->
+    <script>
+        function randomString(length = 16) {
+            var str = "";
+            for (var i = 0; i < length; i++) {
+                str += "x";
+            }
+            return str.replace(/x/g, function (c) {
+                var r = Math.random() * 16 | 0, v = c == "x" ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+    </script>
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <div>
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div class="d-flex align-items-center titulo">
+                    <img src="./icon.svg">
+                    <h2>Tabs configuradas</h2>
+                </div>
+
+                <div class="d-flex align-items-center status-atual">
+                    <b>Status atual</b>
+                    <div class="form-check form-switch">
+                        <div class="status-switch" for="switch">Desligado</div>
+                        <input class="form-check-input" type="checkbox" role="switch" id="switch">
+                    </div>
+                </div>
+
+            </div>
+            <form>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Nome</th>
+                            <th>URL</th>
+                            <th>Duração</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr id="linha-form" data-type="form">
+                            <td>#</td>
+                            <td><input type="text" required class="form-control" id="nome" placeholder="Bancos de dados..."></td>
+                            <td><input type="url" inputmode="url" required class="form-control" id="url" placeholder="https://grafana.luizalabs.com/montoria..."></td>
+                            <td><input type="number" inputmode="numeric" min="10" max="60" required class="form-control" id="duracao" placeholder="50 segundos"></td>
+                            <td><button class="btn btn-outline-primary" type="submit">💾 Salvar</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+
+            <div class="footer d-flex">
+                <button id="btn-exportar" class="btn btn-outline-dark">⬇️ Exportar</button>
+                <button id="btn-importar" class="btn btn-outline-dark">⬆️ Importar</button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+<!-- Drag and Drop JS -->
+<script>
+
+    var dragSrcEl = null;
+
+    function handleDragStart(e) {
+        this.style.opacity = '0.25';
+
+        dragSrcEl = this;
+
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/html', this.innerHTML);
+    }
+
+    function handleDragOver(e) {
+        if (e.preventDefault) {
+            e.preventDefault();
+        }
+
+        e.dataTransfer.dropEffect = 'move';
+
+        return false;
+    }
+
+    function handleDragEnter(e) {
+        this.classList.add('over');
+    }
+
+    function handleDragLeave(e) {
+        this.classList.remove('over');
+    }
+
+    function handleDrop(e) {
+        if (e.stopPropagation) {
+            e.stopPropagation(); // stops the browser from redirecting.
+        }
+
+        if (dragSrcEl != this) {
+            var srcIndex = dragSrcEl.querySelectorAll("td")[0].innerHTML;
+            var dstIndex = this.querySelectorAll("td")[0].innerHTML;
+
+            var src = tabs[srcIndex - 1];
+            tabs[srcIndex - 1] = tabs[dstIndex - 1];
+            tabs[dstIndex - 1] = src;
+
+            renderizarTabs();
+
+            localStorage.setItem('tabs', JSON.stringify(tabs));
+        }
+
+        return false;
+    }
+
+    function handleDragEnd(e) {
+        this.style.opacity = '1';
+
+        document.querySelectorAll('tr[data-type="item"]').forEach(function (item) {
+            item.classList.remove('over');
+        });
+    }
+
+    function enableDraggable(element) {
+        element.addEventListener('dragstart', handleDragStart, element);
+        element.addEventListener('dragenter', handleDragEnter, element);
+        element.addEventListener('dragover', handleDragOver, element);
+        element.addEventListener('dragleave', handleDragLeave, element);
+        element.addEventListener('drop', handleDrop, element);
+        element.addEventListener('dragend', handleDragEnd, element);
+    }
+</script>
+
+
+<!-- Core JS -->
+<script>
+
+    // Init
+    var tabs = JSON.parse(localStorage.getItem('tabs')) || [];
+    renderizarTabs();
+
+    // Função responsável por inicializar o rotate
+    function enableRotate() {
+
+        // Criando função recursiva que irá abrir as tabs a cada X tempo
+        var focusTab = function (index) {            
+            if (tabs[index - 1] && tabs[index - 1].window) {
+                tabs[index - 1].window.close();
+                tabs[index - 1].window = undefined;
+            }
+
+            if (index == tabs.length) {
+                index = 0;
+            }
+
+            tabs[index].window = window.open(tabs[index].url, `tab-rotate-${index}`);
+
+            // Caso a guia esteja aberta focamos nela, caso não esteja aberta então passamos para a próxima
+            if (tabs[index].window) {
+                window.__actualTab = index;
+                window.__timeout = setTimeout(() => {
+                    focusTab(index + 1);
+                }, tabs[index].duracao * 1000);
+                return;
+
+            } else {
+                alert("A guia não foi aberta corretamente devido aos popups estarem bloqueados.");
+                focusTab(index);
+            }
+        };
+
+        // Inicializando a função recursiva baseada na primeira tab
+        focusTab(0);
+
+    }
+
+    // Função responsável por desligar o rotate
+    function disableRotate() {
+        clearTimeout(window.__timeout);
+        for (let i = 0; i < tabs.length; i++) {
+            if (tabs[i].window) {
+                tabs[i].window.close();
+            }
+        }
+    }
+
+    // Função responsável por renderizar todas as tabs na tabela
+    function renderizarTabs() {
+        document.querySelectorAll('tr[data-type="item"]').forEach((tr) => {
+            tr.remove();
+        });
+        tabs.forEach((tab, index) => {
+            renderizarTab(tab, index + 1);
+        });
+    }
+
+    // Função responsável por renderizar uma tab na tabela
+    function renderizarTab(tab, index) {
+        const tr = document.createElement('tr');
+        tr.draggable = true;
+        tr.setAttribute('data-type', 'item');
+
+        const tdIndex = document.createElement('td');
+        tdIndex.innerHTML = index;
+
+        const tdNome = document.createElement('td');
+        tdNome.innerHTML = `${tab.nome}`;
+
+        const tdUrl = document.createElement('td');
+        tdUrl.innerHTML = `<a href="${tab.url}" target="_blank">${tab.url}</a>`;
+
+        const tdDuracao = document.createElement('td');
+        tdDuracao.innerHTML = `${tab.duracao} segundos`;
+
+        const tdAcao = document.createElement('td');
+        tdAcao.innerHTML = `<button class="btn btn-outline-danger" type="button" onclick="removerTab(${index})">🗑️ Excluir</button>`;
+
+        tr.appendChild(tdIndex);
+        tr.appendChild(tdNome);
+        tr.appendChild(tdUrl);
+        tr.appendChild(tdDuracao);
+        tr.appendChild(tdAcao);
+
+        const ultimaLinhaFixa = document.getElementById('linha-form');
+        ultimaLinhaFixa.insertAdjacentElement("beforebegin", tr);
+
+        enableDraggable(tr);
+    }
+
+    // Função responsável por remover uma tab do rotate
+    function removerTab(index) {
+        tabs.splice(index - 1, 1);
+
+        localStorage.setItem('tabs', JSON.stringify(tabs));
+
+        renderizarTabs();
+    }
+
+    // Adicionando um listener para o evento de submit do formulário
+    document.getElementsByTagName('form')[0].onsubmit = function (event) {
+        event.preventDefault();
+
+        const nome = document.getElementById('nome').value;
+        const url = document.getElementById('url').value;
+        const duracao = document.getElementById('duracao').value;
+
+        if (!url) {
+            alert('Você deve informe a URL da tab!');
+            return;
+        }
+        if (!duracao) {
+            alert('Você deve informe a URL da tab!');
+            return;
+        }
+
+        renderizarTab({ nome, url, duracao }, tabs.length + 1);
+        tabs.push({ nome, url, duracao });
+
+        localStorage.setItem('tabs', JSON.stringify(tabs));
+
+        document.getElementById('nome').value = '';
+        document.getElementById('url').value = '';
+        document.getElementById('duracao').value = '';
+    };
+
+    document.querySelector('.form-check-input').addEventListener('change', function (event) {
+
+        if (this.checked) {
+            document.querySelector('.status-switch').innerHTML = 'Ligado';
+            document.querySelector('.status-switch').classList.add('on');
+            localStorage.setItem('status', 'on');
+            if (tabs.length == 0) {
+                alert("Você não possui nenhuma tab configurada!\nConfigura uma tab primeiro para começar a rotacionar.");
+                setTimeout(() => {
+                    document.querySelector('.form-check-input').click();
+                }, 250);
+                return;
+            } else {
+                enableRotate();
+            }
+
+        } else {
+            document.querySelector('.status-switch').innerHTML = 'Desligado';
+            document.querySelector('.status-switch').classList.remove('on');
+            localStorage.setItem('status', 'off');
+            disableRotate();
+        }
+
+    });
+    document.querySelector('.status-switch').addEventListener('click', function () {
+        document.querySelector('.form-check-input').click();
+    });
+
+</script>
+
+<!-- Import & Export -->
+<script>
+
+    // Adicionando um listener no botão de exportar tabs
+    document.getElementById("btn-exportar").onclick = function () {
+        var base64 = "data:application/json;base64," + btoa(JSON.stringify(tabs, null, "\t"));
+
+        var link = document.createElement("a");
+        document.body.appendChild(link);
+        link.setAttribute("type", "hidden");
+        link.href = base64;
+        link.download = "tab-rotate.json";
+        link.click();
+        document.body.removeChild(link);
+
+    };
+
+    // Adicionando um listener no botão de importar tabs
+    document.getElementById("btn-importar").onclick = function () {
+        var input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
+        input.onchange = function (event) {
+            var file = event.target.files[0];
+            var reader = new FileReader();
+            reader.onload = function (event) {
+                tabs = JSON.parse(atob(event.target.result.split(",")[1]));
+                localStorage.setItem('tabs', JSON.stringify(tabs));
+                renderizarTabs();
+            };
+            reader.readAsDataURL(file);
+        };
+        input.click();
+    };
+
+</script>
+
+</html>
