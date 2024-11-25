@@ -316,7 +316,7 @@
     function enableRotate() {
 
         // Criando função recursiva que irá abrir as tabs a cada X tempo
-        var focusTab = function (index) {            
+        var focusTab = function (index) {
             if (tabs[index - 1] && tabs[index - 1].window) {
                 tabs[index - 1].window.close();
                 tabs[index - 1].window = undefined;
@@ -326,20 +326,25 @@
                 index = 0;
             }
 
-            tabs[index].window = window.open(tabs[index].url, `tab-rotate-${index}`);
+            setTimeout(() => {
+                tabs[index].window = window.open(tabs[index].url, `tab-rotate-${index}`);
 
-            // Caso a guia esteja aberta focamos nela, caso não esteja aberta então passamos para a próxima
-            if (tabs[index].window) {
-                window.__actualTab = index;
-                window.__timeout = setTimeout(() => {
-                    focusTab(index + 1);
-                }, tabs[index].duracao * 1000);
-                return;
+                // Caso a guia esteja aberta focamos nela, caso não esteja aberta então passamos para a próxima
+                if (tabs[index].window) {
+                    window.__actualTab = index;
+                    window.__timeout = setTimeout(() => {
+                        focusTab(index + 1);
+                    }, tabs[index].duracao * 1000);
+                    return;
 
-            } else {
-                alert("A guia não foi aberta corretamente devido aos popups estarem bloqueados.");
-                focusTab(index);
-            }
+                } else {
+                    alert("A guia não foi aberta corretamente devido aos popups estarem bloqueados.");
+                    document.querySelector('.form-check-input').click();
+                    return;
+                }
+
+            }, 500);
+
         };
 
         // Inicializando a função recursiva baseada na primeira tab
@@ -407,6 +412,10 @@
         localStorage.setItem('tabs', JSON.stringify(tabs));
 
         renderizarTabs();
+
+        if (document.querySelector('.status-switch').classList.contains('on')) {
+            document.querySelector('.form-check-input').click();
+        }
     }
 
     // Adicionando um listener para o evento de submit do formulário
