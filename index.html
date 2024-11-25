@@ -146,6 +146,15 @@
             padding-right: 10px !important;
         }
 
+        .nowrap {
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+            word-break: break-word;
+            word-wrap: break-word;
+            max-width: 475px;
+        }
+
         @keyframes blink {
 
             0%,
@@ -385,7 +394,7 @@
         tdNome.innerHTML = `${tab.nome}`;
 
         const tdUrl = document.createElement('td');
-        tdUrl.innerHTML = `<a href="${tab.url}" target="_blank">${tab.url}</a>`;
+        tdUrl.innerHTML = `<div class="nowrap"><a href="${tab.url}" target="_blank">${tab.url}</a></div>`;
 
         const tdDuracao = document.createElement('td');
         tdDuracao.innerHTML = `${tab.duracao} segundos`;
